@@ -42,7 +42,9 @@ bool Collision(TPoint APoint, TCircle ACircle) {
 }
 
 bool Collision(TPoint APoint, TRectangle ARectangle) {
-    if (APoint.x >= ARectangle.LeftTopCorner.x && APoint.x <= ARectangle.LeftTopCorner.x + ARectangle.Width && APoint.y >= ARectangle.LeftTopCorner.y && APoint.y <= ARectangle.LeftTopCorner.y + ARectangle.Height) {
+    if (APoint.x >= ARectangle.LeftTopCorner.x &&
+        APoint.x <= ARectangle.LeftTopCorner.x + ARectangle.Width &&
+        APoint.y >= ARectangle.LeftTopCorner.y && APoint.y <= ARectangle.LeftTopCorner.y + ARectangle.Height) {
         return true;
     }
     else {
@@ -116,8 +118,10 @@ bool Collision(TCircle ACircle, TRectangle ARectangle) {
 }
 
 bool RectInRect(TRectangle ARectangle1, TRectangle ARectangle2) {
-    if (ARectangle1.LeftTopCorner.x >= ARectangle2.LeftTopCorner.x && ARectangle1.LeftTopCorner.y >= ARectangle2.LeftTopCorner.y &&
-        ARectangle1.LeftTopCorner.x + ARectangle1.Width <= ARectangle2.LeftTopCorner.x + ARectangle2.Width && ARectangle1.LeftTopCorner.y + ARectangle1.Height <= ARectangle2.LeftTopCorner.y + ARectangle2.Height) {
+    if (ARectangle1.LeftTopCorner.x >= ARectangle2.LeftTopCorner.x &&
+        ARectangle1.LeftTopCorner.y >= ARectangle2.LeftTopCorner.y &&
+        ARectangle1.LeftTopCorner.x + ARectangle1.Width <= ARectangle2.LeftTopCorner.x + ARectangle2.Width &&
+        ARectangle1.LeftTopCorner.y + ARectangle1.Height <= ARectangle2.LeftTopCorner.y + ARectangle2.Height) {
         return true;
     }
     else {

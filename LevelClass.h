@@ -2,30 +2,30 @@
 #define LEVELCLASS_H_INCLUDED
 
 #include <vector>
-#include <stdlib.h>
 #include "GameFramework.h"
 #include "BrickClass.h"
 
-class CLevel {
+class CLevel : public CRectangleGameObject {
     // Class fields
     public:
     protected:
     private:
         std::vector<CBrick*> FBricks;
-        unsigned int FBackground;
-        unsigned int FBrickTexture;
-        TRectangle FRectangle;
+        unsigned int FBrickTexture1,
+                     FBrickTexture2,
+                     FBrickTexture3;
         unsigned int FBrickCount;
         bool FLevelClear;
     // Class functions
     public:
-        CLevel();
+        CLevel(unsigned int ATexture);
         ~CLevel();
     public:
-        void Draw();
-        TRectangle GetRectangle();
+        void Draw() override;
         TRectangle GetBrickRectangle(int AIndex);
         unsigned int GetBrickCount();
+        unsigned int GetPoints(int AIndex);
+        unsigned int GetLifes(int AIndex);
         void DestroyBrick(int AIndex);
         bool BrickDestroyed(int AIndex);
         void Init(unsigned int ALevel);

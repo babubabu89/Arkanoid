@@ -3,16 +3,10 @@
 // CPad Class;
 // ===== Constructor/Destructor =====
 
-CPad::CPad(float Ax, float Ay, unsigned int ATexture) {
-    FRectangle.LeftTopCorner.x = Ax;
-    FRectangle.LeftTopCorner.y = Ay;
+CPad::CPad(float Ax, float Ay, unsigned int ATexture) : CRectangleGameObject(Ax, Ay, 2.0f, 0.5f, ATexture) {
     FStartPosition.x = Ax;
     FStartPosition.y = Ay;
-    FRectangle.Width = 2.0f;
-    FRectangle.Height = 0.5f;
     FSpeed = 16.0f;
-
-    FTexture = ATexture;
 }
 
 CPad::~CPad() {
@@ -21,20 +15,16 @@ CPad::~CPad() {
 
 // ===== Public =====
 
-void CPad::Draw() {
-    DrawQuadTexture(FRectangle.LeftTopCorner.x, FRectangle.LeftTopCorner.y, FRectangle.Width, FRectangle.Height, FTexture);
-}
-
 void CPad::MoveLeft(float ADeltaTime) {
-    FRectangle.LeftTopCorner.x -= (FSpeed * ADeltaTime);
+    TRectangle CurrentRectangle = GetRectangle();
+    CurrentRectangle.LeftTopCorner.x -= (FSpeed * ADeltaTime);
+    SetNewPosition(CurrentRectangle.LeftTopCorner);
 }
 
 void CPad::MoveRight(float ADeltaTime) {
-    FRectangle.LeftTopCorner.x += (FSpeed * ADeltaTime);
-}
-
-TRectangle CPad::GetRectangle() {
-    return FRectangle;
+    TRectangle CurrentRectangle = GetRectangle();
+    CurrentRectangle.LeftTopCorner.x += (FSpeed * ADeltaTime);
+    SetNewPosition(CurrentRectangle.LeftTopCorner);
 }
 
 float CPad::GetSpeed() {
@@ -42,7 +32,7 @@ float CPad::GetSpeed() {
 }
 
 void CPad::PutOnStartPosition() {
-    FRectangle.LeftTopCorner = FStartPosition;
+    SetNewPosition(FStartPosition);
 }
 // ===== Protected =====
 // ===== Private =====

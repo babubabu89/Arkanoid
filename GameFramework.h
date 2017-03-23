@@ -9,6 +9,8 @@
 #include <SDL2/SDL_image.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
+#include <cstring>
 
 class CCustomApplication {
     // Class fields.
@@ -42,9 +44,18 @@ class CCustomApplication {
         void EventsQueue();
 };
 
+struct TNumericFont {
+  std::vector<unsigned int> NumberTexture;
+  float Width, Height;
+};
+
 void DrawQuad(float Ax, float Ay, float AWidth, float AHeight);
 void DrawQuadRGBA(float Ax, float Ay, float AWidth, float AHeight, float ARed, float AGreen, float ABlue, float AAlpha);
 void DrawQuadTexture(float Ax, float Ay, float AWidth, float AHeight, unsigned int ATexture_id);
 unsigned int ImgToTexture(const char *AFileName);
+void DeleteTexture(unsigned int ATexture);
+TNumericFont LoadFont(float ASize);
+void FreeFont(TNumericFont *AFont);
+void PrintInt(float Ax, float Ay, TNumericFont AFont, int AInt);
 
 #endif // GAMEFRAMEWORK_H_INCLUDED

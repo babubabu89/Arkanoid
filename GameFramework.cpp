@@ -129,13 +129,10 @@ void CCustomApplication::EventsQueue() {
 // ===== Other Functions =====
 
 void DrawQuad(float Ax, float Ay, float AWidth, float AHeight) {
-    AWidth /= 2.0f;
-    AHeight /= 2.0f;
-
     float LeftX = Ax;
     float TopY = Ay;
-    float RightX = Ax + AWidth * 2;
-    float BottomY = Ay + AHeight * 2;
+    float RightX = Ax + AWidth;
+    float BottomY = Ay + AHeight ;
 
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f); glVertex2f(LeftX, TopY);
@@ -146,15 +143,10 @@ void DrawQuad(float Ax, float Ay, float AWidth, float AHeight) {
 }
 
 void DrawQuadRGBA(float Ax, float Ay, float AWidth, float AHeight, float ARed, float AGreen, float ABlue, float AAlpha) {
-    // Get old color.
     float current_color[4];
     glGetFloatv(GL_CURRENT_COLOR, current_color);
-
-    // Set new color and draw quad.
     glColor4f(ARed, AGreen, ABlue, AAlpha);
     DrawQuad(Ax, Ay, AWidth, AHeight);
-
-    // Set old color.
     glColor4fv(current_color);
 }
 
@@ -174,16 +166,13 @@ void DrawQuadTexture(float Ax, float Ay, float AWidth, float AHeight, unsigned i
 }
 
 unsigned int ImgToTexture(const char *AFileName) {
-    // Load image.
     SDL_Surface *img = IMG_Load(AFileName);
     if(!img) {
         printf("ERROR: ImgToTexture could not load image \"%s\"\n", AFileName);
         return ~0;
     }
-
     // Image type? Only 24 and 32 supported, rest must be converted.
     unsigned int img_type = 0;
-
     if(img->format->BitsPerPixel == 32) {
         img_type = GL_RGBA;
     }
@@ -191,7 +180,6 @@ unsigned int ImgToTexture(const char *AFileName) {
         img_type = GL_RGB;
     }
     else {
-        // Convert to 32 bits.
         SDL_PixelFormat fmt = {SDL_PIXELFORMAT_RGBA32, NULL, 32, 4, 0, 0, 0, 0};
 
         SDL_Surface *nimg = SDL_ConvertSurface(img, &fmt, SDL_SWSURFACE);
@@ -201,31 +189,59 @@ unsigned int ImgToTexture(const char *AFileName) {
             printf("ERROR: ImgToTexture could not convert image \"%s\" to 32-bit\n", AFileName);
             return ~0;
         }
-
-        // Done converting.
         img = nimg;
         img_type = GL_RGBA;
     }
 
-    // Create texture.
     unsigned int texture_id = ~0;
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    // You might want to play with these parameters.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    // Gen texture.
     glTexImage2D(GL_TEXTURE_2D, 0, img_type, img->w, img->h, 0, img_type, GL_UNSIGNED_BYTE, img->pixels);
 
-    printf("INFO: ImgToTexture loaded texture \"%s\" as %u\n", AFileName, texture_id);
-
-    // Done
     SDL_FreeSurface(img);
     return texture_id;
+}
+
+void DeleteTexture(unsigned int ATexture) {
+    glDeleteTextures(1, &ATexture);
+}
+
+TNumericFont LoadFont(float ASize) {
+    TNumericFont Font;
+    float ratio = 1.0f / 1.5f;
+
+    Font.Height = ASize;
+    Font.Width = Font.Height * ratio;
+    Font.NumberTexture.reserve(10);
+
+    for (int i = 0; i < 10; i++) {
+        char FileName[256] = {0};
+        snprintf(FileName, sizeof(FileName) - 1, "graphics/%u.png", i);
+        Font.NumberTexture.push_back(ImgToTexture(FileName));
+    }
+
+    return Font;
+}
+
+void FreeFont(TNumericFont *AFont) {
+    AFont->Width = 0.0f;
+    AFont->Height = 0.0f;
+    for (int i = 0; i < 10; i++) {
+        DeleteTexture(AFont->NumberTexture[i]);
+    }
+}
+
+void PrintInt(float Ax, float Ay, TNumericFont AFont, int AInt) {
+    char StrInt[256] = {0};
+    snprintf(StrInt, sizeof(StrInt) - 1, "%u", AInt);
+    for (unsigned int i = 0; i < std::strlen(StrInt); i++) {
+        float x = Ax + (AFont.Width * i);
+        DrawQuadTexture(x, Ay, AFont.Width, AFont.Height, AFont.NumberTexture[(int)(StrInt[i] - 48)]);
+    }
 }

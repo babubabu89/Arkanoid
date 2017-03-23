@@ -3,14 +3,10 @@
 // CLevel Class;
 // ===== Constructor/Destructor =====
 
-CLevel::CLevel() {
-    FBrickTexture = ImgToTexture("graphic/Brick.png");
-    FBackground = ImgToTexture("graphic/Background.png");
-
-    FRectangle.LeftTopCorner.x = -16.0f;
-    FRectangle.LeftTopCorner.y = -12.0f;
-    FRectangle.Width = 32.0f;
-    FRectangle.Height = 24.0f;
+CLevel::CLevel(unsigned int ATexture) : CRectangleGameObject(-16.0f, -12.0f, 32.0f, 24.0f, ATexture) {
+    FBrickTexture1 = ImgToTexture("graphics/Brick1.png");
+    FBrickTexture2 = ImgToTexture("graphics/Brick2.png");
+    FBrickTexture3 = ImgToTexture("graphics/Brick3.png");
 
     FBrickCount = 0;
     FBricks.reserve(128);
@@ -19,20 +15,21 @@ CLevel::CLevel() {
 
 CLevel::~CLevel() {
     Clear();
+    DeleteTexture(FBrickTexture1);
+    DeleteTexture(FBrickTexture2);
+    DeleteTexture(FBrickTexture3);
 }
 
 // ===== Public =====
 
 void CLevel::Draw() {
-    DrawQuadTexture(FRectangle.LeftTopCorner.x, FRectangle.LeftTopCorner.y, FRectangle.Width, FRectangle.Height, FBackground);
-
+    CRectangleGameObject::Draw();
     for (unsigned int i = 0; i < FBricks.size(); i++) {
-        FBricks[i]->Draw();
+        unsigned int BrickLifes = FBricks[i]->GetLifes();
+        if (BrickLifes > 0) {
+            FBricks[i]->Draw();
+        }
     }
-}
-
-TRectangle CLevel::GetRectangle() {
-    return FRectangle;
 }
 
 TRectangle CLevel::GetBrickRectangle(int AIndex) {
@@ -43,9 +40,19 @@ unsigned int CLevel::GetBrickCount() {
     return FBricks.size();
 }
 
+unsigned int CLevel::GetPoints(int AIndex) {
+    return FBricks[AIndex]->GetPoints();
+}
+
+unsigned int CLevel::GetLifes(int AIndex) {
+    return FBricks[AIndex]->GetLifes();
+}
+
 void CLevel::DestroyBrick(int AIndex) {
     FBricks[AIndex]->LooseLife();
-    FBrickCount--;
+    if (FBricks[AIndex]->GetLifes() <= 0) {
+        FBrickCount--;
+    }
     if (FBrickCount == 0) {
         FLevelClear = true;
     }
@@ -70,25 +77,15 @@ void CLevel::Init(unsigned int ALevel) {
             By = (float)(y - 10.0) ;
             switch (Line[x]) {
                 case '1':
-                    FBricks.push_back(new CBrick(Bx, By, 1, FBrickTexture));
+                    FBricks.push_back(new CBrick(Bx, By, 1, 1, FBrickTexture1));
                     FBrickCount++;
-                    printf("FROM FILE   x: %i | y: %i\n", x, y);
-                    printf("CALCULATED Bx: %f | By: %f\n\n", Bx, By);
                     break;
                 case '2':
-                    FBricks.push_back(new CBrick(Bx, By, 2, FBrickTexture));
+                    FBricks.push_back(new CBrick(Bx, By, 2, 2, FBrickTexture2));
                     FBrickCount++;
                     break;
                 case '3':
-                    FBricks.push_back(new CBrick(Bx, By, 3, FBrickTexture));
-                    FBrickCount++;
-                    break;
-                case '4':
-                    FBricks.push_back(new CBrick(Bx, By, 4, FBrickTexture));
-                    FBrickCount++;
-                    break;
-                case '5':
-                    FBricks.push_back(new CBrick(Bx, By, 5, FBrickTexture));
+                    FBricks.push_back(new CBrick(Bx, By, 3, 3, FBrickTexture3));
                     FBrickCount++;
                     break;
             }
@@ -96,23 +93,11 @@ void CLevel::Init(unsigned int ALevel) {
     }
     fclose(MapFile);
 
-/*
-    for (unsigned int i = 0; i < 128; i++) {
-        Bx = (float)(IndexToX(i) * 2 - 16.0);
-        By = (float)(IndexToY(i) - 10.0);
-        FBricks.push_back(new CBrick(Bx, By, 1, FBrickTexture));
-        FBrickCount++;
-        printf("CALCULATED Bx: %f | By: %f\n\n", Bx, By);
-    }
-*/
-    printf("Bricks vector size: %i\n", FBricks.size());
-    printf("Bricks count: %i\n", FBrickCount);
-
     FLevelClear = false;
 }
 
 void CLevel::Clear() {
-    for (unsigned int i = 0; i < FBrickCount; i++) {
+    for (unsigned int i = 0; i < FBricks.size(); i++) {
         delete FBricks[i];
     }
     FBricks.clear();

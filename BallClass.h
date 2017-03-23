@@ -3,8 +3,9 @@
 
 #include "GameFramework.h"
 #include "physics2D.h"
+#include "CircleGameObjectClass.h"
 
-class CBall {
+class CBall : public CCircleGameObject {
     // Class fields
     public:
     protected:
@@ -19,9 +20,7 @@ class CBall {
         CBall(float Ax, float Ay, unsigned int ATexture);
         ~CBall();
     public:
-        void Draw();
         void Move(float ADeltaTime);
-        TCircle GetCircle();
         float GetSpeedX();
         float GetSpeedY();
         void ChangeSpeedX();

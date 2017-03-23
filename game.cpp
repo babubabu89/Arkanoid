@@ -4,18 +4,21 @@
 // ===== Constructor/Destructor =====
 
 CGame::CGame(int AWidth, int AHeight) : CCustomApplication(AWidth, AHeight) {
-    FLevel = new CLevel();
+    FBackgroundTexture = ImgToTexture("graphics/Background.png");
+    FLevel = new CLevel(FBackgroundTexture);
 
-    FPadTexture = ImgToTexture("graphic/Pad.png");
+    FPadTexture = ImgToTexture("graphics/Pad.png");
     FPad = new CPad (0.0f - 1.0f, 10.0f, FPadTexture);
 
-    FBallTexture = ImgToTexture("graphic/Ball.png");
+    FBallTexture = ImgToTexture("graphics/Ball.png");
     FBall = new CBall (0.0f - 0.125f, 10.0f - 0.26f, FBallTexture);
 
-    FSplashScreenTexture = ImgToTexture("graphic/SplashScreen.png");
-    FNextLevelTexture = ImgToTexture("graphic/NextLevel.png");
-    FWonGameTexture = ImgToTexture("graphic/WonGame.png");
-    FLostGameTexture = ImgToTexture("graphic/LostGame.png");
+    FSplashScreenTexture = ImgToTexture("graphics/SplashScreen.png");
+    FNextLevelTexture = ImgToTexture("graphics/NextLevel.png");
+    FWonGameTexture = ImgToTexture("graphics/WonGame.png");
+    FLostGameTexture = ImgToTexture("graphics/LostGame.png");
+
+    FFont = LoadFont(1.0f);
 
     FLifes = 3;
 
@@ -29,9 +32,16 @@ CGame::CGame(int AWidth, int AHeight) : CCustomApplication(AWidth, AHeight) {
 }
 
 CGame::~CGame() {
-    delete FLevel;
     delete FPad;
     delete FBall;
+    delete FLevel;
+    DeleteTexture(FBallTexture);
+    DeleteTexture(FPadTexture);
+    DeleteTexture(FSplashScreenTexture);
+    DeleteTexture(FNextLevelTexture);
+    DeleteTexture(FWonGameTexture);
+    DeleteTexture(FLostGameTexture);
+    FreeFont(&FFont);
 }
 
 // ===== Public =====
@@ -40,10 +50,10 @@ CGame::~CGame() {
 void CGame::Logic() {
     switch (FCurrentScreen) {
         case SplashScreen:
-            SplashScreenLogic();
+            TimeScreenLogic();
             break;
         case NextLevelScreen:
-            SplashScreenLogic();
+            TimeScreenLogic();
             break;
         case WonGameScreen:
             KeyScreenLogic();
@@ -151,6 +161,7 @@ void CGame::DrawGameScreen() {
     FLevel->Draw();
     FPad->Draw();
     FBall->Draw();
+    PrintInt(0, -13, FFont, FPoints);
 }
 
 void CGame::GameLogic() {
@@ -218,7 +229,9 @@ void CGame::GameLogic() {
                 FBall->ChangeSpeedX();
             }
             FLevel->DestroyBrick(i);
-            printf("Collision with brick %i\n", i);
+            if (FLevel->GetLifes(i) <= 0) {
+                FPoints += FLevel->GetPoints(i);
+            }
         }
     }
 
@@ -233,7 +246,6 @@ void CGame::GameLogic() {
     }
 
     if (FLevel->LevelClear()) {
-        printf("Current lvl: %i\n", FCurrentLevel);
         FCurrentLevel++;
         if (FCurrentLevel > FMaxLevel) {
             FCurrentLevel = 1;
@@ -254,7 +266,7 @@ void CGame::GameLogic() {
     }
 }
 
-void CGame::SplashScreenLogic() {
+void CGame::TimeScreenLogic() {
     if (FCurrentTime > FMaxTime) {
         FCurrentScreen = GameScreen;
         FCurrentTime = 0;

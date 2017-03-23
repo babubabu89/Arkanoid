@@ -1,7 +1,6 @@
 #ifndef PHYSICS2D_H_INCLUDED
 #define PHYSICS2D_H_INCLUDED
 
-#include <stdlib.h>
 #include <cmath>
 
 struct TPoint {

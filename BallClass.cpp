@@ -3,18 +3,13 @@
 // CBall Class;
 // ===== Constructor/Destructor =====
 
-CBall::CBall(float Ax, float Ay, unsigned int ATexture) {
-    FCircle.Center.x = Ax;
-    FCircle.Center.y = Ay;
+CBall::CBall(float Ax, float Ay, unsigned int ATexture) : CCircleGameObject(Ax, Ay, 0.25f, ATexture){
     FStartPosition.x = Ax;
     FStartPosition.y = Ay;
-    FCircle.Radius = 0.25f;
 
-    FSpeedX = 12.0f;
-    FSpeedY = 12.0f;
+    FSpeedX = 10.0f;
+    FSpeedY = 10.0f;
     FMove = false;
-
-    FTexture = ATexture;
 }
 
 CBall::~CBall() {
@@ -23,17 +18,11 @@ CBall::~CBall() {
 
 // ===== Public =====
 
-void CBall::Draw() {
-    DrawQuadTexture(FCircle.Center.x - FCircle.Radius, FCircle.Center.y - FCircle.Radius, FCircle.Radius * 2, FCircle.Radius * 2, FTexture);
-}
-
 void CBall::Move(float ADeltaTime){
-    FCircle.Center.x += FSpeedX * ADeltaTime;
-    FCircle.Center.y += FSpeedY * ADeltaTime;
-}
-
-TCircle CBall::GetCircle() {
-    return FCircle;
+    TCircle CurrentCircle = GetCircle();
+    CurrentCircle.Center.x += FSpeedX * ADeltaTime;
+    CurrentCircle.Center.y += FSpeedY * ADeltaTime;
+    SetNewPosition(CurrentCircle.Center);
 }
 
 float CBall::GetSpeedX() {
@@ -65,7 +54,7 @@ bool CBall::Moving() {
 }
 
 void CBall::PutOnStartPosition() {
-    FCircle.Center = FStartPosition;
+    SetNewPosition(FStartPosition);
 }
 // ===== Protected =====
 // ===== Private =====

@@ -26,15 +26,18 @@ class CGame : public CCustomApplication {
         CLevel* FLevel;
         CPad* FPad;
         CBall* FBall;
+        TNumericFont FFont;
         unsigned int FBallTexture,
                      FPadTexture,
+                     FBackgroundTexture,
                      FSplashScreenTexture,
                      FNextLevelTexture,
                      FWonGameTexture,
                      FLostGameTexture;
         unsigned int FLifes,
                      FCurrentLevel,
-                     FMaxLevel;
+                     FMaxLevel,
+                     FPoints;
         float FCurrentTime,
               FMaxTime;
         TGameScreen FCurrentScreen;
@@ -59,7 +62,7 @@ class CGame : public CCustomApplication {
         void DrawGameScreen();
 
         void GameLogic();
-        void SplashScreenLogic();
+        void TimeScreenLogic();
         void KeyScreenLogic();
 };
 

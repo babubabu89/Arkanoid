@@ -3,14 +3,13 @@
 
 #include "GameFramework.h"
 #include "physics2D.h"
+#include "RectangleGameObjectClass.h"
 
-class CPad {
+class CPad : public CRectangleGameObject {
     // Class fields
     public:
     protected:
     private:
-        unsigned int FTexture;
-        TRectangle FRectangle;
         TPoint FStartPosition;
         float FSpeed;
     // Class functions
@@ -18,10 +17,8 @@ class CPad {
         CPad(float Ax, float Ay, unsigned int ATexture);
         ~CPad();
     public:
-        void Draw();
         void MoveLeft(float ADeltaTime);
         void MoveRight(float ADeltaTime);
-        TRectangle GetRectangle();
         float GetSpeed();
         void PutOnStartPosition();
     protected:
